@@ -12,5 +12,7 @@ public interface IUserRepository
     Task AddUserFollowAsync(Guid followerId, Guid followingId);
     Task RemoveUserFollowAsync(Guid followerId, Guid followingId);
     Task<bool> IsFollowingAsync(Guid followerId, Guid followingId);
+
+    // Add this method to retrieve all users, returning a list of ApplicationUser
     Task<IReadOnlyList<ApplicationUser>> GetAllAsync();
 }

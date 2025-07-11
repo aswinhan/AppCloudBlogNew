@@ -22,3 +22,5 @@ global using System.Net;
 global using System.Linq.Expressions;
 global using Microsoft.Extensions.DependencyInjection;
 global using System.Reflection;
+global using AppCloudBlog.Domain.Entities.JoinEntities;
+global using Ganss.Xss;

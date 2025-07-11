@@ -1,50 +1,39 @@
 ﻿namespace AppCloudBlog.Infrastructure.Shared.Services
 {
-    public class JwtService : IJwtService
-    {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IConfiguration _configuration;
-        private readonly IUnitOfWork _unitOfWork; // To manage RefreshToken persistence
-
-        public JwtService(
+    public class JwtService(
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration,
-            IUnitOfWork unitOfWork)
-        {
-            _userManager = userManager;
-            _configuration = configuration;
-            _unitOfWork = unitOfWork;
-        }
+            IUnitOfWork unitOfWork) : IJwtService
+    {
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly IConfiguration _configuration = configuration;
+        private readonly IUnitOfWork _unitOfWork = unitOfWork; // To manage RefreshToken persistence
 
         public async Task<AuthResponseDto> GenerateJwtAndRefreshToken(ApplicationUser user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Email, user.Email!),
+                new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
             };
-
-            foreach (var role in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var jwtSettings = _configuration.GetSection("JwtSettings");
-            if (jwtSettings == null || 
-                string.IsNullOrEmpty(jwtSettings) ||
-                string.IsNullOrEmpty(jwtSettings["Issuer"]) || 
+            if (jwtSettings == null ||
+                string.IsNullOrEmpty(jwtSettings["Issuer"]) ||
                 string.IsNullOrEmpty(jwtSettings["Audience"]) ||
-                string.IsNullOrEmpty(jwtSettings) || 
-                string.IsNullOrEmpty(jwtSettings))
+                string.IsNullOrEmpty(jwtSettings["Key"]) ||
+                string.IsNullOrEmpty(jwtSettings["TokenExpirationMinutes"]) ||
+                string.IsNullOrEmpty(jwtSettings["RefreshTokenExpirationDays"]))
             {
                 throw new InvalidOperationException("JWT settings are not configured correctly in appsettings.json.");
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var tokenExpirationMinutes = Convert.ToDouble(jwtSettings);
+            var tokenExpirationMinutes = Convert.ToDouble(jwtSettings["TokenExpirationMinutes"]);
             var tokenExpires = DateTime.UtcNow.AddMinutes(tokenExpirationMinutes);
 
             var token = new JwtSecurityToken(
@@ -57,7 +46,7 @@
 
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            var refreshTokenExpirationDays = Convert.ToDouble(jwtSettings);
+            var refreshTokenExpirationDays = Convert.ToDouble(jwtSettings["RefreshTokenExpirationDays"]);
             var refreshToken = new RefreshToken
             {
                 Token = Guid.NewGuid().ToString(),

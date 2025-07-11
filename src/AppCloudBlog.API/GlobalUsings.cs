@@ -1,3 +1,13 @@
 ﻿global using AppCloudBlog.Application;
 global using AppCloudBlog.Infrastructure.Persistence;
 global using AppCloudBlog.Infrastructure.Shared;
+global using Microsoft.AspNetCore.Diagnostics;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Logging;
+global using System;
+global using System.Net;
+global using AppCloudBlog.Application.Exceptions;
+global using Ganss.Xss;
+global using Microsoft.AspNetCore.Mvc.Versioning;
+global using AppCloudBlog.API.Middleware;

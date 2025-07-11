@@ -15,17 +15,16 @@ public class GetAllUsersQueryHandler(IUnitOfWork unitOfWork, UserManager<Applica
     public async Task<IReadOnlyList<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
     {
         // Now, _unitOfWork.Users.GetAllAsync() returns IReadOnlyList<ApplicationUser>
-        var users = await _unitOfWork.Users.GetAllAsync(); // S_R1, S_R2
+        var users = await _unitOfWork.Users.GetAllAsync();
 
-        var userDtos = new List<UserDto>();
-        foreach (var user in users) // Iterate over the fetched users
+        var userDtos = users.Select(async user =>
         {
             var userDto = _mapper.Map<UserDto>(user);
-            var roles = await _userManager.GetRolesAsync(user); // [1, 2, 3]
+            var roles = await _userManager.GetRolesAsync(user);
             userDto.Roles = roles.ToList();
-            userDtos.Add(userDto);
-        }
+            return userDto;
+        }).ToList();
 
-        return userDtos;
+        return await Task.WhenAll(userDtos);
     }
 }

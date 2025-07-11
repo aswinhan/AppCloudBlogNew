@@ -17,9 +17,10 @@
             return entity;
         }
 
-        public async Task DeleteAsync(T entity)
+        public Task DeleteAsync(T entity)
         {
             _dbSet.Remove(entity);
+            return Task.CompletedTask;
         }
 
         public async Task<IReadOnlyList<T>> GetAllAsync()
@@ -32,9 +33,10 @@
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task UpdateAsync(T entity)
+        public Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
+            return Task.CompletedTask;
         }
 
         public async Task<int> CountAsync()

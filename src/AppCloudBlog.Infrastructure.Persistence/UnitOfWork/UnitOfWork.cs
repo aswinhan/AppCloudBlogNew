@@ -2,10 +2,11 @@
 
 // UnitOfWork coordinates multiple repositories and manages database transactions.
 // It ensures that all changes within a business operation are committed or rolled back atomically.
-public class UnitOfWork(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : IUnitOfWork
+public class UnitOfWork(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IGenericRepository<BaseEntity> genericRepository) : IUnitOfWork
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly UserManager<ApplicationUser> _userManager = userManager; // Injected for UserRepository
+    private readonly IGenericRepository<BaseEntity> _genericRepository = genericRepository; // Injected for generic repository
 
     // Private fields for lazy initialization of repositories
     private IPostRepository? _posts;
@@ -14,7 +15,6 @@ public class UnitOfWork(ApplicationDbContext dbContext, UserManager<ApplicationU
     private ICommentRepository? _comments;
     private INotificationRepository? _notifications;
     private IUserRepository? _users;
-    private readonly IGenericRepository<BaseEntity>? _genericRepository; // For the generic method
 
     // Lazy initialization for each repository property
     public IPostRepository Posts => _posts ??= new PostRepository(_dbContext);
@@ -27,8 +27,6 @@ public class UnitOfWork(ApplicationDbContext dbContext, UserManager<ApplicationU
     // Generic repository method for entities not having a specific repository interface
     public IGenericRepository<TEntity> Repository<TEntity>() where TEntity : BaseEntity
     {
-        // This is a simple way to get a generic repository.
-        // For more complex scenarios, you might use a factory or DI container directly.
         return _genericRepository as IGenericRepository<TEntity> ?? new GenericRepository<TEntity>(_dbContext);
     }
 

@@ -22,4 +22,5 @@ public class PostDto
     public int LikeCount { get; set; } // Aggregated count
     public bool IsLikedByUser { get; set; } // Indicates if the current user liked it
     public bool IsSavedByUser { get; set; } // Indicates if the current user saved it
+    public int CommentCount { get; internal set; }
 }

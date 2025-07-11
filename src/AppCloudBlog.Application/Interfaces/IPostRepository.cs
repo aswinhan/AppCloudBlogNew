@@ -9,4 +9,5 @@ public interface IPostRepository : IGenericRepository<Post>
     Task<IReadOnlyList<Post>> GetPostsByCategoryIdAsync(Guid categoryId);
     Task<IReadOnlyList<Post>> GetPostsByTagIdAsync(Guid tagId);
     Task<IReadOnlyList<Post>> GetPostsByAuthorIdAsync(Guid authorId);
+    Task<Post?> GetPostWithDetailsAsync(Guid id);
 }
