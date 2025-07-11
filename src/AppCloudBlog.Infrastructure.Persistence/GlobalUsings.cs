@@ -1,0 +1,12 @@
+﻿global using AppCloudBlog.Domain.Common;
+global using AppCloudBlog.Domain.Entities;
+global using AppCloudBlog.Domain.Entities.JoinEntities;
+global using Microsoft.EntityFrameworkCore;
+global using AppCloudBlog.Application.Interfaces;
+global using AppCloudBlog.Infrastructure.Persistence.Context;
+global using System.Linq.Expressions;
+global using AppCloudBlog.Infrastructure.Persistence.Repositories;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
