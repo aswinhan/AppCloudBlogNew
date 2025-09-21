@@ -5,9 +5,8 @@
         public static void MapPostEndpoints(this WebApplication app, ApiVersionSet apiVersionSet)
         {
             var group = app.MapGroup("/api/v{version:apiVersion}/posts")
-                     .WithApiVersionSet(apiVersionSet) // Use the passed ApiVersionSet [3, 4]
-                     .WithTags("posts")
-                     .MapToApiVersion(1, 0); // Map to specific API version [4, 5]
+                     .WithApiVersionSet(apiVersionSet)
+                     .WithTags("posts");
 
             // POST /api/v1/posts
             group.MapPost("/", async (CreatePostDto postDto, ClaimsPrincipal user, ISender sender) =>
@@ -16,7 +15,7 @@
                 var result = await sender.Send(new CreatePostCommand(postDto, authorId)); // S_R1, S_R12
                 return Results.Created($"/api/v1/posts/{result.Id}", new ApiResponse<PostDto> { Data = result });
             })
-           .RequireAuthorization("Publisher", "Admin") // Only Publishers or Admins can create posts
+           .RequireAuthorization("PUBLISHER_OR_ADMIN") // Only Publishers or Admins can create posts
            .WithOpenApi();
 
             // GET /api/v1/posts/{id}
@@ -49,7 +48,7 @@
                 var result = await sender.Send(new UpdatePostCommand(id, postDto, currentUserId)); // S_R12, S_R17
                 return Results.Ok(new ApiResponse<PostDto> { Data = result });
             })
-           .RequireAuthorization("Publisher", "Admin")
+           .RequireAuthorization("PUBLISHER_OR_ADMIN")
            .WithOpenApi();
 
             // DELETE /api/v1/posts/{id}
@@ -59,7 +58,7 @@
                 await sender.Send(new DeletePostCommand(id, currentUserId)); // S_R1, S_R33, S_R47
                 return Results.NoContent(); // 204 No Content
             })
-           .RequireAuthorization("Publisher", "Admin")
+           .RequireAuthorization("PUBLISHER_OR_ADMIN")
            .WithOpenApi();
         }
     }

@@ -1,13 +1,14 @@
-﻿namespace AppCloudBlog.API.Endpoints;
+﻿using System;
+
+namespace AppCloudBlog.API.Endpoints;
 
 public static class CategoryEndpoints
 {
     public static void MapCategoryEndpoints(this WebApplication app, ApiVersionSet apiVersionSet)
     {
         var group = app.MapGroup("/api/v{version:apiVersion}/categories")
-                     .WithApiVersionSet(apiVersionSet) // Use the passed ApiVersionSet [3, 4]
-                     .WithTags("categories")
-                     .MapToApiVersion(1, 0); // Map to specific API version [4, 5]
+                     .WithApiVersionSet(apiVersionSet)
+                     .WithTags("categories");
 
         // POST /api/v1/categories
         group.MapPost("/", async (CreateCategoryDto categoryDto, ISender sender) =>
@@ -15,7 +16,7 @@ public static class CategoryEndpoints
             var result = await sender.Send(new CreateCategoryCommand(categoryDto));
             return Results.Created($"/api/v1/categories/{result.Id}", new ApiResponse<CategoryDto> { Data = result });
         })
-       .RequireAuthorization("Admin") // Only Admins can create categories
+       .RequireAuthorization("ADMIN") // Only Admins can create categories
        .WithOpenApi();
 
         // GET /api/v1/categories/{id}
@@ -42,7 +43,7 @@ public static class CategoryEndpoints
             var result = await sender.Send(new UpdateCategoryCommand(id, categoryDto));
             return Results.Ok(new ApiResponse<CategoryDto> { Data = result });
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
 
         // DELETE /api/v1/categories/{id}
@@ -51,7 +52,7 @@ public static class CategoryEndpoints
             await sender.Send(new DeleteCategoryCommand(id));
             return Results.NoContent();
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
     }
 }

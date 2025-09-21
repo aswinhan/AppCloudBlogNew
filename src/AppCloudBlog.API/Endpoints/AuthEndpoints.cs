@@ -5,19 +5,18 @@ public static class AuthEndpoints
     // Accept ApiVersionSet as a parameter [3, 4]
     public static void MapAuthEndpoints(this WebApplication app, ApiVersionSet apiVersionSet)
     {
-        var group = app.MapGroup("/api/v{version:apiVersion}/auth")
-                     .WithApiVersionSet(apiVersionSet) // Use the passed ApiVersionSet [3, 4]
-                     .WithTags("Auth")
-                     .MapToApiVersion(1, 0); // Map to specific API version [4, 5]
 
-        // POST /api/v1/auth/login
+        var group = app.MapGroup("/api/v{version:apiVersion}/auth")
+        .WithApiVersionSet(apiVersionSet)
+        .WithTags("Auth");
+
         group.MapPost("/login", async (UserLoginDto loginDto, ISender sender) =>
         {
-            var result = await sender.Send(new LoginCommand(loginDto)); // S_R1, S_R12
+            var result = await sender.Send(new LoginCommand(loginDto));
             return Results.Ok(new ApiResponse<AuthResponseDto> { Data = result });
         })
-      .AllowAnonymous()
-      .WithOpenApi();
+        .AllowAnonymous()
+        .WithOpenApi();
 
         // POST /api/v1/auth/register
         group.MapPost("/register", async (UserRegistrationDto registrationDto, ISender sender) =>

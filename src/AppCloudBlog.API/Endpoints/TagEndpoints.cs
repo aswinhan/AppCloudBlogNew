@@ -5,9 +5,8 @@ public static class TagEndpoints
     public static void MapTagEndpoints(this WebApplication app, ApiVersionSet apiVersionSet)
     {
         var group = app.MapGroup("/api/v{version:apiVersion}/tags")
-                     .WithApiVersionSet(apiVersionSet) // Use the passed ApiVersionSet [3, 4]
-                     .WithTags("tags")
-                     .MapToApiVersion(1, 0); // Map to specific API version [4, 5]
+                     .WithApiVersionSet(apiVersionSet)
+                     .WithTags("tags");
 
         // POST /api/v1/tags
         group.MapPost("/", async (CreateTagDto tagDto, ISender sender) =>
@@ -15,7 +14,7 @@ public static class TagEndpoints
             var result = await sender.Send(new CreateTagCommand(tagDto));
             return Results.Created($"/api/v1/tags/{result.Id}", new ApiResponse<TagDto> { Data = result });
         })
-       .RequireAuthorization("Admin") // Only Admins can create tags
+       .RequireAuthorization("ADMIN") // Only Admins can create tags
        .WithOpenApi();
 
         // GET /api/v1/tags/{id}
@@ -42,7 +41,7 @@ public static class TagEndpoints
             var result = await sender.Send(new UpdateTagCommand(id, tagDto));
             return Results.Ok(new ApiResponse<TagDto> { Data = result });
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
 
         // DELETE /api/v1/tags/{id}
@@ -51,7 +50,7 @@ public static class TagEndpoints
             await sender.Send(new DeleteTagCommand(id));
             return Results.NoContent();
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
     }
 }

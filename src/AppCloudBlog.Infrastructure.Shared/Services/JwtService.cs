@@ -24,14 +24,14 @@
             if (jwtSettings == null ||
                 string.IsNullOrEmpty(jwtSettings["Issuer"]) ||
                 string.IsNullOrEmpty(jwtSettings["Audience"]) ||
-                string.IsNullOrEmpty(jwtSettings["Key"]) ||
+                string.IsNullOrEmpty(jwtSettings["Secret"]) ||
                 string.IsNullOrEmpty(jwtSettings["TokenExpirationMinutes"]) ||
                 string.IsNullOrEmpty(jwtSettings["RefreshTokenExpirationDays"]))
             {
                 throw new InvalidOperationException("JWT settings are not configured correctly in appsettings.json.");
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var tokenExpirationMinutes = Convert.ToDouble(jwtSettings["TokenExpirationMinutes"]);
             var tokenExpires = DateTime.UtcNow.AddMinutes(tokenExpirationMinutes);

@@ -67,8 +67,8 @@ public class RegisterUserCommandHandler(
             throw new FluentValidation.ValidationException(string.Join("; ", errors));
         }
 
-        // Assign default role (e.g., "Subscriber")
-        await _userManager.AddToRoleAsync(user, "Subscriber");
+        // Assign default role (e.g., "SUBSCRIBER", "ADMIN", "PUBLISHER")
+        await _userManager.AddToRoleAsync(user, "ADMIN");
 
         // Use the reusable JWT service
         var authResponse = await _jwtService.GenerateJwtAndRefreshToken(user);

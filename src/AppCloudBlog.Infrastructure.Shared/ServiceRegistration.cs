@@ -2,7 +2,7 @@
 
 public static class ServiceRegistration
 {
-    public static void AddSharedInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSharedInfrastructure(this IServiceCollection services, IConfiguration _)
     {
         // Register JWT Service
         services.AddScoped<IJwtService, JwtService>();
@@ -27,3 +27,4 @@ public class DummyEmailService(ILogger<DummyEmailService> logger) : IEmailServic
         return Task.CompletedTask;
     }
 }
+

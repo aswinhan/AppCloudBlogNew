@@ -5,9 +5,8 @@ public static class UserEndpoints
     public static void MapUserEndpoints(this WebApplication app, ApiVersionSet apiVersionSet)
     {
         var group = app.MapGroup("/api/v{version:apiVersion}/users")
-                     .WithApiVersionSet(apiVersionSet) // Use the passed ApiVersionSet [3, 4]
-                     .WithTags("users")
-                     .MapToApiVersion(1, 0); // Map to specific API version [4, 5]
+                     .WithApiVersionSet(apiVersionSet)
+                     .WithTags("users");
 
         // GET /api/v1/users/{id}
         group.MapGet("/{id:guid}", async (Guid id, ISender sender) =>
@@ -41,7 +40,7 @@ public static class UserEndpoints
             var result = await sender.Send(new GetAllUsersQuery());
             return Results.Ok(new ApiResponse<IReadOnlyList<UserDto>> { Data = result });
         })
-       .RequireAuthorization("Admin") // Requires Admin role
+       .RequireAuthorization("ADMIN") // Requires Admin role
        .WithOpenApi();
 
         // PUT /api/v1/users/{id}/toggle-status (Admin only)
@@ -50,7 +49,7 @@ public static class UserEndpoints
             await sender.Send(new ToggleUserStatusCommand(id, isActive));
             return Results.NoContent(); // 204 No Content
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
 
         // DELETE /api/v1/users/{id} (Admin only)
@@ -59,7 +58,7 @@ public static class UserEndpoints
             await sender.Send(new DeleteUserCommand(id));
             return Results.NoContent();
         })
-       .RequireAuthorization("Admin")
+       .RequireAuthorization("ADMIN")
        .WithOpenApi();
 
         // POST /api/v1/users/{id}/follow
